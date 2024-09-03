@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:marketplace/screens/auth/auth_signup.dart';
 import 'package:marketplace/screens/main/main_dashboard.dart';
+import 'package:marketplace/screens/main/pages/add_service_page.dart';
+import 'package:marketplace/services/auth_methods.dart';
 import 'package:marketplace/utils/colors.dart';
 import 'package:marketplace/widgets/save_button.dart';
 import 'package:flutter_social_button/flutter_social_button.dart';
@@ -111,19 +115,45 @@ class _AuthLoginState extends State<AuthLogin> {
                   )),
             ),
           ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SaveButton(
-                  title: "Log In",
-                  onTap: () async {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (builder) => MainDashboard()));
-                  }),
-            ),
-          ),
+          isLoading
+              ? Center(
+                  child: CircularProgressIndicator(
+                    color: mainColor,
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SaveButton(
+                    title: "Login",
+                    onTap: () async {
+                      if (customerEmailController.text.isEmpty ||
+                          customerPassController.text.isEmpty) {
+                        showMessageBar(
+                            "Email and Password is Required", context);
+                      } else {
+                        setState(() {
+                          isLoading = true;
+                        });
+                        String rse = await AuthMethods().loginUpUser(
+                          email: customerEmailController.text.trim(),
+                          pass: customerPassController.text.trim(),
+                        );
+
+                        setState(() {
+                          isLoading = false;
+                        });
+                        if (rse == 'success') {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (builder) => MainDashboard()));
+                        } else {
+                          showMessageBar(rse, context);
+                        }
+                      }
+                    },
+                  ),
+                ),
           // GestureDetector(
           //   onTap: () {
           //     Navigator.push(context,
@@ -145,8 +175,37 @@ class _AuthLoginState extends State<AuthLogin> {
             children: [
               FlutterSocialButton(
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (builder) => MainDashboard()));
+                  AuthMethods().signInWithGoogle().then((value) async {
+                    setState(() {
+                      isGoogle = true;
+                    });
+                    User? user = FirebaseAuth.instance.currentUser;
+
+                    // Check if user data exists in Firestore
+
+                    // If user data doesn't exist, store it
+
+                    // Set user data in Firestore
+                    await FirebaseFirestore.instance
+                        .collection("users")
+                        .doc(user?.uid)
+                        .set({
+                      "image": user?.photoURL?.toString(),
+                      "email": user?.email,
+                      "fullName": user?.displayName,
+                      "uid": user?.uid,
+                      "password": "Auto Take Password",
+                      "confrimPassword": "Auto Take Password"
+                    });
+
+                    setState(() {
+                      isGoogle = false;
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (builder) => MainDashboard()));
+                    });
+                  });
                 },
                 mini: true,
                 buttonType: ButtonType.google,
