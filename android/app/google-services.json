@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "208306386817",
+    "project_id": "kelimbo",
+    "storage_bucket": "kelimbo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:208306386817:android:1fb261cc7dcf6cabf75a80",
+        "android_client_info": {
+          "package_name": "com.kelimbo.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCD7nwpRHhP_HRBJEmaQEz2dRcfxxcgIc4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
