@@ -1,10 +1,17 @@
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:marketplace/screens/main/main_dashboard.dart';
+import 'package:marketplace/services/storage_methods.dart';
 import 'package:marketplace/utils/colors.dart';
+import 'package:marketplace/utils/image_utils.dart';
 import 'package:marketplace/widgets/save_button.dart';
 import 'package:marketplace/widgets/text_form_field.dart';
+import 'package:uuid/uuid.dart';
 
 class AddServicePage extends StatefulWidget {
   const AddServicePage({super.key});
@@ -35,7 +42,7 @@ class _AddServicePageState extends State<AddServicePage> {
 
   // Loading bar
   bool isAdded = false;
-
+  var uuid = Uuid().v4();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,11 +92,12 @@ class _AddServicePageState extends State<AddServicePage> {
                 ),
               ),
               GestureDetector(
-                onTap: () {},
+                onTap: () => selectImage(),
                 child: _image != null
                     ? CircleAvatar(
                         radius: 59, backgroundImage: MemoryImage(_image!))
                     : GestureDetector(
+                        onTap: () => selectImage(),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Image.asset("assets/Choose Image.png"),
@@ -174,12 +182,64 @@ class _AddServicePageState extends State<AddServicePage> {
               ),
 
               SaveButton(
-                title: "Publish",
-                onTap: () async {},
-              ),
+                  title: "Publish",
+                  onTap: () async {
+                    if (serviceNameController.text.isEmpty) {
+                      showMessageBar("Title  is Required", context);
+                    } else if (descriptionController.text.isEmpty) {
+                      showMessageBar("Description is Required", context);
+                    } else if (_image == null) {
+                      showMessageBar("Image is Required", context);
+                    } else if (priceController.text.isEmpty) {
+                      showMessageBar("Price is Required", context);
+                    }
+
+                    setState(() {
+                      isAdded = true;
+                    });
+                    String photoURL =
+                        await StorageMethods().uploadImageToStorage(
+                      'ProfilePics',
+                      _image!,
+                    );
+                    await FirebaseFirestore.instance
+                        .collection("services")
+                        .doc(uuid)
+                        .set({
+                      "photo": photoURL,
+                      "titleName": serviceNameController.text,
+                      "description": descriptionController.text,
+                      "price": int.parse(priceController.text),
+                      "priceHr": int.parse(discountController.text) ?? 0,
+                      "image": _image,
+                      "category": _selectedCategory,
+                      "subCategory": _selectedSubCategory,
+                      "uuid": uuid,
+                      "uid": FirebaseAuth.instance.currentUser!.uid
+                    });
+
+                    setState(() {
+                      isAdded = false;
+                    });
+                    // Handle the result accordingly
+                    showMessageBar("Services Added Successfully", context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (builder) => MainDashboard(),
+                      ),
+                    );
+                  }),
             ],
           ),
         ));
+  }
+
+  selectImage() async {
+    Uint8List ui = await pickImage(ImageSource.gallery);
+    setState(() {
+      _image = ui;
+    });
   }
 }
 
