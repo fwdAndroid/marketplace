@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:marketplace/screens/profile_pages/edit_profile.dart';
@@ -22,15 +24,41 @@ class _ProfilePageState extends State<ProfilePage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              CircleAvatar(
-                radius: 50,
-                backgroundImage: AssetImage("assets/person.png"),
-              ),
-              Text(
-                "Estudio juridico Alvarez",
-                style: GoogleFonts.workSans(
-                    fontWeight: FontWeight.w900, fontSize: 22),
-              ),
+              StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection("users")
+                      .doc(FirebaseAuth.instance.currentUser!.uid)
+                      .snapshots(),
+                  builder: (context, AsyncSnapshot snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (!snapshot.hasData || snapshot.data == null) {
+                      return Center(child: Text('No data available'));
+                    }
+                    var snap = snapshot.data;
+
+                    return Column(
+                      children: [
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: CircleAvatar(
+                              backgroundImage: NetworkImage(
+                                snap['photoURL'],
+                              ),
+                              radius: 60,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          snap['fullName'],
+                          style: GoogleFonts.workSans(
+                              fontWeight: FontWeight.w900, fontSize: 22),
+                        ),
+                      ],
+                    );
+                  }),
               const SizedBox(
                 height: 8,
               ),
