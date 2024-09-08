@@ -59,6 +59,31 @@ class _SignUpState extends State<SignUp> {
               GoogleFonts.workSans(fontSize: 22, fontWeight: FontWeight.w500),
         ),
       ),
+      GestureDetector(
+        onTap: () => selectImage(),
+        child: Stack(
+          children: [
+            _image != null
+                ? CircleAvatar(
+                    radius: 59, backgroundImage: MemoryImage(_image!))
+                : CircleAvatar(
+                    radius: 59,
+                    backgroundImage: AssetImage('assets/profilephoto.png'),
+                  ),
+            Positioned(
+              bottom: -10,
+              left: 70,
+              child: IconButton(
+                onPressed: () => selectImage(),
+                icon: Icon(
+                  Icons.add_a_photo,
+                  color: colorBlack,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
       Padding(
         padding: const EdgeInsets.only(left: 8.0, right: 8),
         child: TextFormInputField(
@@ -206,29 +231,29 @@ class _SignUpState extends State<SignUp> {
           mini: true,
           buttonType: ButtonType.facebook,
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (builder) => AuthLogin()));
-              },
-              child: Text.rich(TextSpan(
-                  text: 'Already Have an account ',
-                  children: <InlineSpan>[
-                    TextSpan(
-                      text: 'Sign IN',
-                      style: GoogleFonts.workSans(
-                          color: mainColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700),
-                    )
-                  ])),
-            ),
+      ]),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (builder) => AuthLogin()));
+            },
+            child: Text.rich(TextSpan(
+                text: 'Already Have an account ',
+                children: <InlineSpan>[
+                  TextSpan(
+                    text: 'Sign IN',
+                    style: GoogleFonts.workSans(
+                        color: mainColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700),
+                  )
+                ])),
           ),
-        )
-      ])
+        ),
+      )
     ])));
   }
 

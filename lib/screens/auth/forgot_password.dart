@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:marketplace/screens/auth/auth_login.dart';
 import 'package:marketplace/utils/colors.dart';
 import 'package:marketplace/widgets/save_button.dart';
 
@@ -12,6 +15,7 @@ class ForgotPassword extends StatefulWidget {
 
 class _ForgotPasswordState extends State<ForgotPassword> {
   TextEditingController customerEmailController = TextEditingController();
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,10 +57,33 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           const SizedBox(
             height: 25,
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SaveButton(title: "Reset Password", onTap: () async {}),
-          ),
+          isLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SaveButton(
+                      title: "Reset Password",
+                      onTap: () async {
+                        setState(() {
+                          isLoading = true;
+                        });
+                        await FirebaseAuth.instance
+                            .sendPasswordResetEmail(
+                                email: customerEmailController.text)
+                            .then((onValue) async {
+                          await FirebaseAuth.instance.signOut();
+                        });
+                        setState(() {
+                          isLoading = false;
+                        });
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (builder) => AuthLogin()));
+                      }),
+                ),
         ],
       ),
     );
