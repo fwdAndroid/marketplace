@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_social_button/flutter_social_button.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -25,7 +26,7 @@ class _SignUpState extends State<SignUp> {
   TextEditingController providerEmailController = TextEditingController();
   TextEditingController providerFullNameContoller = TextEditingController();
   TextEditingController providerPassController = TextEditingController();
-
+  TextEditingController NameController = TextEditingController();
   //Password Check
   bool passwordVisible = false;
   bool passwordVisibleConfrim = false;
@@ -87,6 +88,14 @@ class _SignUpState extends State<SignUp> {
       Padding(
         padding: const EdgeInsets.only(left: 8.0, right: 8),
         child: TextFormInputField(
+            controller: NameController,
+            hintText: "Full Name",
+            IconSuffix: Icons.email,
+            textInputType: TextInputType.emailAddress),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(left: 8.0, right: 8),
+        child: TextFormInputField(
             controller: providerEmailController,
             hintText: "Email Address",
             IconSuffix: Icons.email,
@@ -144,7 +153,7 @@ class _SignUpState extends State<SignUp> {
               hintStyle: GoogleFonts.nunitoSans(fontSize: 16),
               hintText: "Confirm Password",
             ),
-            controller: providerPassController,
+            controller: providerFullNameContoller,
           )),
       Padding(
         padding: const EdgeInsets.all(8.0),
@@ -170,6 +179,7 @@ class _SignUpState extends State<SignUp> {
                     await AuthMethods().signUpUser(
                         email: providerEmailController.text.trim(),
                         pass: providerPassController.text.trim(),
+                        name: NameController.text.trim(),
                         file: _image!);
                     setState(() {
                       isLoading = false;

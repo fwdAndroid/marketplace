@@ -21,6 +21,7 @@ class AuthMethods {
   Future<String> signUpUser(
       {required String email,
       required String pass,
+      required String name,
       required Uint8List file}) async {
     String res = 'Wrong Email or Password';
     try {
@@ -37,7 +38,7 @@ class AuthMethods {
             uid: cred.user!.uid,
             email: email,
             password: pass,
-            fullName: "",
+            fullName: name,
             image: photoURL);
         await firebaseFirestore
             .collection('users')
