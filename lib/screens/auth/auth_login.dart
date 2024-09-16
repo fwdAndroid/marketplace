@@ -149,6 +149,10 @@ class _AuthLoginState extends State<AuthLogin> {
                                   builder: (builder) => MainDashboard()));
                         } else {
                           showMessageBar(rse, context);
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (builder) => MainDashboard()));
                         }
                       }
                     },

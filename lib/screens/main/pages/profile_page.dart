@@ -45,7 +45,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             padding: const EdgeInsets.all(8.0),
                             child: CircleAvatar(
                               backgroundImage: NetworkImage(
-                                snap['photoURL'],
+                                snap['image'],
                               ),
                               radius: 60,
                             ),
